@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RestApi.Entities;
 using RestApi.Repositories;
+using RestApi.Services;
 using System;
 using System.Collections.Generic;
 
@@ -14,16 +15,16 @@ namespace RestApi.Test
 
         public GetByIdAuthorControllerTest()
         {
-            SetUpRestApiRepositoryMoq(restApiRepositoryMoq);
+            SetUpRestApiRepositoryMoq(restApiServiceMoq);
 
         }
 
-        private static void SetUpRestApiRepositoryMoq( Mock<IRestApiRepository> restApiRepositoryMoq)
+        private static void SetUpRestApiRepositoryMoq( Mock<IRestApiService> restApiServiceMoq)
         {         
-            restApiRepositoryMoq.Setup(c => c.GetAuthor(_invalidadAuthorId)).Returns((Author)null);
+            restApiServiceMoq.Setup(c => c.GetAuthor(_invalidadAuthorId)).Returns((Author)null);
 
             var authorObject = new Author { Id = _validadAuthorId, FirstName = "ValidFirstName", LastName = "ValidLastName" };
-            restApiRepositoryMoq.Setup(c => c.GetAuthor(_validadAuthorId)).Returns(authorObject);
+            restApiServiceMoq.Setup(c => c.GetAuthor(_validadAuthorId)).Returns(authorObject);
         }
 
 

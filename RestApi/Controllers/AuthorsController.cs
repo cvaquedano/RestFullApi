@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Net.Http.Headers;
 using System.Threading.Tasks;
+using RestApi.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,20 +20,20 @@ namespace RestApi.Controllers
     [ApiController]
     public class AuthorsController : ControllerBase
     {
-        private readonly IRestApiRepository _restApiRepository;
+        private readonly IRestApiService _restApiService;
         private readonly IMapper _mapper;
 
-        public AuthorsController(IRestApiRepository restApiRepository, IMapper mapper)
+        public AuthorsController(IRestApiService restApiService, IMapper mapper)
         {
             _mapper = mapper ??
               throw new ArgumentException(nameof(mapper));
-            _restApiRepository = restApiRepository ?? throw new ArgumentNullException(nameof(restApiRepository));
+            _restApiService = restApiService ?? throw new ArgumentNullException(nameof(restApiService));
         }
         // GET: api/<AuthorsController>
         [HttpGet(Name = "GetAuthors")]
         public IActionResult Get([FromQuery] AuthorRequestDto authorRequestDto)
         {
-            var authorsFromRepo = _restApiRepository.GetAuthors(authorRequestDto);
+            var authorsFromRepo = _restApiService.GetAuthors(authorRequestDto);
             var paginationMetadata = new
             {
                 totalCount = authorsFromRepo.TotalCount,
@@ -75,7 +76,7 @@ namespace RestApi.Controllers
                 return BadRequest();
             }
 
-            var authorFromRepo = _restApiRepository.GetAuthor(authorId);
+            var authorFromRepo = _restApiService.GetAuthor(authorId);
 
             if (authorFromRepo == null)
             {
@@ -110,8 +111,8 @@ namespace RestApi.Controllers
         {
            
             var authorEntity = _mapper.Map<Author>(author);
-            _restApiRepository.AddAuthor(authorEntity);
-            _restApiRepository.Save();
+            _restApiService.AddAuthor(authorEntity);
+            _restApiService.Save();
 
             var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
 
@@ -132,15 +133,15 @@ namespace RestApi.Controllers
         [HttpPut("{authorId}")]
         public IActionResult UpdateAuthor(Guid authorId, AuthorForUpdateDto author)
         {
-            if (!_restApiRepository.AuthorExists(authorId))
+            if (!_restApiService.AuthorExists(authorId))
             {
                 return NotFound();
             }
-            var authorFromRepo = _restApiRepository.GetAuthor(authorId);
+            var authorFromRepo = _restApiService.GetAuthor(authorId);
 
             _mapper.Map(author, authorFromRepo);
-            _restApiRepository.UpdateAuthor(authorFromRepo);
-            _restApiRepository.Save();
+            _restApiService.UpdateAuthor(authorFromRepo);
+            _restApiService.Save();
 
             return NoContent();
         }
@@ -152,14 +153,14 @@ namespace RestApi.Controllers
         {
 
 
-            var authorFromRepo = _restApiRepository.GetAuthor(authorId);
+            var authorFromRepo = _restApiService.GetAuthor(authorId);
             if (authorFromRepo == null)
             {
                 return NotFound();
 
             }
-            _restApiRepository.DeleteAuthor(authorFromRepo);
-            _restApiRepository.Save();
+            _restApiService.DeleteAuthor(authorFromRepo);
+            _restApiService.Save();
 
             return NoContent();
 

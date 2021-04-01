@@ -6,15 +6,16 @@ using Moq;
 using RestApi.Controllers;
 using RestApi.Profiles;
 using RestApi.Repositories;
+using RestApi.Services;
 using System;
 
 namespace RestApi.Test
 {
     public class AuthorControllerBaseTest
     {
-        protected readonly IRestApiRepository _restApiRepository;
+        protected readonly IRestApiService _restApiService;
         private IMapper _mapper;
-        protected Mock<IRestApiRepository> restApiRepositoryMoq  = new Mock<IRestApiRepository>();   
+        protected Mock<IRestApiService> restApiServiceMoq  = new Mock<IRestApiService>();   
         protected readonly AuthorsController _authorsController;
 
         protected static readonly Guid _invalidadAuthorId = new Guid("8FA566F0-8C0A-4DAA-A0B6-03CAD6D410BE");
@@ -28,9 +29,9 @@ namespace RestApi.Test
             SetUpMapper();
                         
 
-            _restApiRepository = restApiRepositoryMoq.Object;
+            _restApiService = restApiServiceMoq.Object;
 
-            _authorsController = new AuthorsController(_restApiRepository, _mapper)
+            _authorsController = new AuthorsController(_restApiService, _mapper)
             {
                 ControllerContext = controllerContext,
                 Url = mockUrlHelper.Object

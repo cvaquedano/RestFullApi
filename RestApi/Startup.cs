@@ -8,6 +8,7 @@ using RestApi.DbContexts;
 using RestApi.Repositories;
 using System;
 using AutoMapper;
+using RestApi.Services;
 
 namespace RestApi
 {
@@ -26,6 +27,7 @@ namespace RestApi
             services.AddControllers();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddScoped<IRestApiService, RestApiService>();
             services.AddScoped<IRestApiRepository, RestApiRepository>();
             services.AddDbContext<RestApiContext>(options =>
             {

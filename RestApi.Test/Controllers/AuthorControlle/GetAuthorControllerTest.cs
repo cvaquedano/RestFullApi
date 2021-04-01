@@ -5,6 +5,7 @@ using RestApi.Entities;
 using RestApi.Helpers;
 using RestApi.Models;
 using RestApi.Repositories;
+using RestApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,10 @@ namespace RestApi.Test
 
         public GetAuthorControllerTest()
         {
-            SetUpRestApiRepositoryMoq(restApiRepositoryMoq);
+            SetUpRestApiServiceMoq(restApiServiceMoq);
         }
 
-        private static void SetUpRestApiRepositoryMoq(Mock<IRestApiRepository> restApiRepositoryMoq)
+        private static void SetUpRestApiServiceMoq(Mock<IRestApiService> restApiRepositoryMoq)
         {
             var collection = new List<Author> { new Author { } };
             var pagedList = PagedList<Author>.Create(collection.AsQueryable(), authorRequestDto.PageNumber, authorRequestDto.PageSize);

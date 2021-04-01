@@ -1,22 +1,21 @@
-﻿using RestApi.DbContexts;
-using RestApi.Entities;
+﻿using RestApi.Entities;
 using RestApi.Helpers;
+using RestApi.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace RestApi.Repositories
+namespace RestApi.Services
 {
-    public class RestApiRepository : IRestApiRepository, IDisposable
+    public class RestApiService : IRestApiService
     {
-        private readonly RestApiContext _context;
+        private readonly IRestApiRepository _restApiRepository;
+      
 
-        public RestApiRepository(RestApiContext context)
+        public RestApiService(IRestApiRepository restApiRepository)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-          
-        }      
+            _restApiRepository = restApiRepository ?? throw new ArgumentNullException(nameof(restApiRepository));
+
+        }
 
         public void AddAuthor(Author author)
         {
@@ -25,7 +24,13 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(author));
             }
 
-            _context.Authors.Add(author);
+            author.Id = Guid.NewGuid();
+
+            foreach (var book in author.Books)
+            {
+                book.Id = Guid.NewGuid();
+            }
+            _restApiRepository.AddAuthor(author);
         }
 
         public void AddBook(Guid authorId, Book book)
@@ -39,9 +44,9 @@ namespace RestApi.Repositories
             {
                 throw new ArgumentNullException(nameof(book));
             }
-           
-          
-            _context.Books.Add(book);
+
+            book.AuthorId = authorId;
+            _restApiRepository.AddBook( authorId,  book);
         }
 
         public bool AuthorExists(Guid authorId)
@@ -51,7 +56,7 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            return _context.Authors.Any(a => a.Id == authorId);
+            return _restApiRepository.AuthorExists(authorId);
         }
 
         public void DeleteAuthor(Author author)
@@ -61,15 +66,15 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(author));
             }
 
-            _context.Authors.Remove(author);
+            _restApiRepository.DeleteAuthor(author);
         }
 
         public void DeleteBook(Book book)
         {
-            _context.Books.Remove(book);
+            _restApiRepository.DeleteBook(book);
         }
 
-      
+
 
         public Author GetAuthor(Guid authorId)
         {
@@ -78,7 +83,7 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            return _context.Authors.FirstOrDefault(a => a.Id == authorId);
+            return _restApiRepository.GetAuthor(authorId);
         }
 
         public PagedList<Author> GetAuthors(Models.AuthorRequestDto authorRequestDto)
@@ -88,25 +93,7 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(authorRequestDto));
             }
 
-            var collection = _context.Authors as IQueryable<Author>;
-
-
-            if (!string.IsNullOrWhiteSpace(authorRequestDto.SearchQuery))
-            {
-                authorRequestDto.SearchQuery = authorRequestDto.SearchQuery.Trim();
-                collection = collection.Where(a => a.FirstName.Contains(authorRequestDto.SearchQuery)
-                || a.LastName.Contains(authorRequestDto.SearchQuery));
-            }
-
-            //if (!string.IsNullOrWhiteSpace(authorRequestDto.OrderBy))
-            //{
-            //    var authorPropertyMappingDiccionary = _propertyMappingService.GetPropertyMapping<AuthorDto, Author>();
-
-            //    collection = collection.ApplySort(authorRequestDto.OrderBy, authorPropertyMappingDiccionary);
-            //}
-            return PagedList<Author>.Create(collection, authorRequestDto.PageNumber, authorRequestDto.PageSize);
-
-           
+            return _restApiRepository.GetAuthors(authorRequestDto);
         }
 
         public Book GetBook(Guid authorId, Guid bookId)
@@ -121,8 +108,7 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(bookId));
             }
 
-            return _context.Books
-              .Where(c => c.AuthorId == authorId && c.Id == bookId).FirstOrDefault();
+            return _restApiRepository.GetBook(authorId,bookId);
         }
 
         public IEnumerable<Book> GetBooks(Guid authorId)
@@ -132,30 +118,23 @@ namespace RestApi.Repositories
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            return _context.Books
-                        .Where(c => c.AuthorId == authorId)
-                        .OrderBy(c => c.Title).ToList();
+            return _restApiRepository.GetBooks(authorId);
         }
 
         public bool Save()
         {
-            return (_context.SaveChanges() >= 0);
+            return _restApiRepository.Save();
         }
 
         public void UpdateAuthor(Author author)
         {
-           // throw new NotImplementedException();
+            _restApiRepository.UpdateAuthor(author);
         }
 
         public void UpdateBook(Book book)
         {
-            //throw new NotImplementedException();
+            _restApiRepository.UpdateBook(book);
         }
 
-        public void Dispose()
-        {
-            //Dispose(true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

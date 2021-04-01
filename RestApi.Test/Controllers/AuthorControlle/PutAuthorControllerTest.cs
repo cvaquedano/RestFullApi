@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RestApi.Models;
 using RestApi.Repositories;
+using RestApi.Services;
 
 namespace RestApi.Test
 {
@@ -11,12 +12,12 @@ namespace RestApi.Test
     {
         public PutAuthorControllerTest()
         {
-            SetUpRestApiRepositoryMoq(restApiRepositoryMoq);
+            SetUpRestApiRepositoryMoq(restApiServiceMoq);
         }
-        private  void SetUpRestApiRepositoryMoq(Mock<IRestApiRepository> restApiRepositoryMoq)
+        private  void SetUpRestApiRepositoryMoq(Mock<IRestApiService> restApiServiceMoq)
         {
-            restApiRepositoryMoq.Setup(c => c.AuthorExists(_invalidadAuthorId)).Returns(false);
-            restApiRepositoryMoq.Setup(c => c.AuthorExists(_validadAuthorId)).Returns(true);
+            restApiServiceMoq.Setup(c => c.AuthorExists(_invalidadAuthorId)).Returns(false);
+            restApiServiceMoq.Setup(c => c.AuthorExists(_validadAuthorId)).Returns(true);
         }
 
 
