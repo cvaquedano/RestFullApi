@@ -31,6 +31,7 @@ namespace RestApi.Services
                 book.Id = Guid.NewGuid();
             }
             _restApiRepository.AddAuthor(author);
+            _restApiRepository.Save();
         }
 
         public void AddBook(Guid authorId, Book book)
@@ -47,6 +48,7 @@ namespace RestApi.Services
 
             book.AuthorId = authorId;
             _restApiRepository.AddBook( authorId,  book);
+            _restApiRepository.Save();
         }
 
         public bool AuthorExists(Guid authorId)
@@ -67,11 +69,13 @@ namespace RestApi.Services
             }
 
             _restApiRepository.DeleteAuthor(author);
+            _restApiRepository.Save();
         }
 
         public void DeleteBook(Book book)
         {
             _restApiRepository.DeleteBook(book);
+            _restApiRepository.Save();
         }
 
 

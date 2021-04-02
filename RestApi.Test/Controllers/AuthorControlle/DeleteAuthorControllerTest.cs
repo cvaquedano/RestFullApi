@@ -15,9 +15,9 @@ namespace RestApi.Test
     {
         public DeleteAuthorControllerTest()
         {
-            SetUpRestApiRepositoryMoq(restApiServiceMoq);
+            SetUpRestApiServiceMoq(restApiServiceMoq);
         }
-        private static void SetUpRestApiRepositoryMoq(Mock<IRestApiService> restApiServiceMoq)
+        private static void SetUpRestApiServiceMoq(Mock<IRestApiService> restApiServiceMoq)
         {
             restApiServiceMoq.Setup(c => c.GetAuthor(_invalidadAuthorId)).Returns((Author)null);
 
